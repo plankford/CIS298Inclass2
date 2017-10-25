@@ -1,5 +1,6 @@
 package edu.kvcc.cis298.cis298inclass2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -53,6 +54,14 @@ public class CrimeListFragment extends Fragment {
         return view;
     }
 
+    //Method will get called when we return to this activity from
+    //the CrimeActivity that shows the details
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
     private void updateUI() {
         //This will call the static method on the CrimeLab to get
         //the singleton instance of the CrimeLab.
@@ -61,12 +70,20 @@ public class CrimeListFragment extends Fragment {
         //Get the list of crimes from the CrimeLab
         List<Crime> crimes = crimeLab.getCrimes();
 
-        //Make a new adapter for the Recycler View and send over
-        //the crime List
-        mAdapter = new CrimeAdapter(crimes);
+        //Check to see if the adapter is already created. If so, no need
+        //to make it again. Just notify that the data set has changed.
+        if (mAdapter == null) {
+            //Make a new adapter for the Recycler View and send over
+            //the crime List
+            mAdapter = new CrimeAdapter(crimes);
 
-        //Set the adapter on the Recycler View
-        mCrimeRecyclerView.setAdapter(mAdapter);
+            //Set the adapter on the Recycler View
+            mCrimeRecyclerView.setAdapter(mAdapter);
+        } else {
+            //Tell the adapter that the data set has changed, which will
+            //force a reload of all the data.
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
 
@@ -118,10 +135,8 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            Toast.makeText(getActivity(),
-                    mCrime.getTitle() + " clicked!",
-                    Toast.LENGTH_SHORT)
-                    .show();
+            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            startActivity(intent);
         }
     }
 

@@ -14,11 +14,28 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.util.UUID;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class CrimeFragment extends Fragment {
+
+    private static final String ARG_CRIME_ID = "crime_id";
+
+    public static CrimeFragment newInstance(UUID crimeId) {
+        //Create a new Bundle to store the args for our fragment
+        Bundle args = new Bundle();
+        //Put the crimeId that was passed in into the bundle object args
+        args.putSerializable(ARG_CRIME_ID, crimeId);
+        //Create a new CrimeFragment
+        CrimeFragment fragment = new CrimeFragment();
+        //Set the arguments on the fragment to the args Bundle we created above
+        fragment.setArguments(args);
+        //Return the newly created fragment
+        return fragment;
+    }
 
     //Define a single crime to use in our fragment
     private Crime mCrime;
@@ -31,7 +48,12 @@ public class CrimeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mCrime = new Crime();
+
+        //Get the UUID for the crime from the intent used to start the hosting activity
+        UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
+        //Get a handle to the crimeLab, and once we have it, call the getCrime method
+        //sending in the UUID to get the specific crime we need.
+        mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
     }
 
     @Override
@@ -45,6 +67,7 @@ public class CrimeFragment extends Fragment {
         //we are referring to the only view it has.
         //Here, we need to specify the view that we are pulling widgets out of.
         mTitleField = (EditText)v.findViewById(R.id.crime_title);
+        mTitleField.setText(mCrime.getTitle());
         mTitleField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -71,6 +94,7 @@ public class CrimeFragment extends Fragment {
         mDateButton.setEnabled(false);
 
         mSolvedCheckbox = (CheckBox)v.findViewById(R.id.crime_solved);
+        mSolvedCheckbox.setChecked(mCrime.isSolved());
         mSolvedCheckbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {

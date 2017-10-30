@@ -16,7 +16,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".CrimeActivity">
+        <!--Old way before ViewPager-->
+        <!--<activity android:name=".CrimeActivity">-->
+
+        <!--New Way with ViewPager-->
+        <activity android:name=".CrimePagerActivity">
         </activity>
     </application>
 

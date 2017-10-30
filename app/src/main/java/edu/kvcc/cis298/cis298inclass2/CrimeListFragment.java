@@ -135,7 +135,11 @@ public class CrimeListFragment extends Fragment {
 
         @Override
         public void onClick(View view) {
-            Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+            //This was the old activity that we were creating before ViewPager
+            //Intent intent = CrimeActivity.newIntent(getActivity(), mCrime.getId());
+
+            //This is the new one with the ViewPager
+            Intent intent = CrimePagerActivity.newIntent(getActivity(), mCrime.getId());
             startActivity(intent);
         }
     }

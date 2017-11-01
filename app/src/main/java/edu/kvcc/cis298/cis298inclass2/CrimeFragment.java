@@ -4,6 +4,7 @@ package edu.kvcc.cis298.cis298inclass2;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -23,6 +24,12 @@ import java.util.UUID;
 public class CrimeFragment extends Fragment {
 
     private static final String ARG_CRIME_ID = "crime_id";
+
+    //This string will be used as a key for the fragment manager
+    //when we create the date dialog.
+    //We send it a fragmentManager, and what key we want it to use
+    //when it makes the new fragment.
+    private static final String DIALOG_DATE = "DialogDate";
 
     public static CrimeFragment newInstance(UUID crimeId) {
         //Create a new Bundle to store the args for our fragment
@@ -91,7 +98,22 @@ public class CrimeFragment extends Fragment {
 
         mDateButton = (Button)v.findViewById(R.id.crime_date);
         mDateButton.setText(mCrime.getDate().toString());
-        mDateButton.setEnabled(false);
+        mDateButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FragmentManager manager = getFragmentManager();
+                DatePickerFragment dialog = new DatePickerFragment();
+                //The show method on the DialogFragment we made an instance
+                //of right above takes in a fragmentManager, and a key that
+                //will be used by the fragment manager to hold on to the
+                //instance of the fragment.
+                //This way on screen rotation, the fragment can be retrieved
+                //from the fragmentManager's list without any extra work.
+                //We did not need to do this when making the other fragments
+                //because we did the transaction and committing ourselves.
+                dialog.show(manager, DIALOG_DATE);
+            }
+        });
 
         mSolvedCheckbox = (CheckBox)v.findViewById(R.id.crime_solved);
         mSolvedCheckbox.setChecked(mCrime.isSolved());

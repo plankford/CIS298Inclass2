@@ -1,6 +1,8 @@
 package edu.kvcc.cis298.cis298inclass2;
 
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,6 +17,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 
+import java.util.Date;
 import java.util.UUID;
 
 
@@ -30,6 +33,12 @@ public class CrimeFragment extends Fragment {
     //We send it a fragmentManager, and what key we want it to use
     //when it makes the new fragment.
     private static final String DIALOG_DATE = "DialogDate";
+
+    //A integer request code that we can send over to the date dialog
+    //when control is returned back to here because the dialog closes
+    //we can check this request code to see what work we need to do
+    //checking it will happen onActivityResult despite the fact that we
+    private static final int REQUEST_DATE = 0;
 
     public static CrimeFragment newInstance(UUID crimeId) {
         //Create a new Bundle to store the args for our fragment
@@ -102,7 +111,15 @@ public class CrimeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 FragmentManager manager = getFragmentManager();
-                DatePickerFragment dialog = new DatePickerFragment();
+                //DatePickerFragment dialog = new DatePickerFragment();
+                DatePickerFragment dialog = DatePickerFragment
+                        .newInstance(mCrime.getDate());
+
+                //Set the target fragment for the dialog for when it
+                //id done. This is where we are expecting the return
+                //to once it has finished its work
+                dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+
                 //The show method on the DialogFragment we made an instance
                 //of right above takes in a fragmentManager, and a key that
                 //will be used by the fragment manager to hold on to the
@@ -128,4 +145,28 @@ public class CrimeFragment extends Fragment {
         return v;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //if the result coe is not RESULT_OK skip doing work
+        if (resultCode != Activity.RESULT_OK) {
+            return;
+        }
+        /*
+        check to see if the requestCode is the same as the date request
+        code we used wen we set the target fragment for the date dialog
+         */
+        if (requestCode == REQUEST_DATE) {
+            /*
+            get the date from the intect object that was returned/passed
+            into this method. Use the KEY that was declared on the
+            DatePickerFragment as a const to the access that data in the intent
+            This is a little different that how we have been doing things
+             */
+            Date date = (Date) data
+                    .getSerializableExtra(DatePickerFragment.EXTRA_DATE);
+
+            mCrime.setDate(date);
+            mDateButton.setText(mCrime.getDate().toString());
+        }
+    }
 }
